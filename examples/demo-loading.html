@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Loading Screen</title>
+    <style>
+      :root {
+        --primary: #4361ee;
+        --success: #10b981;
+        --background: #f8fafc;
+        --text: #1e293b;
+        --border: #e2e8f0;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: var(--background);
+        color: var(--text);
+        height: 100%;
+        width: 100%;
+      }
+
+      #loadingContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--background);
+        transition: opacity 0.5s ease;
+        z-index: 9999;
+      }
+
+      .loading-content {
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+      }
+
+      .logo-container {
+        margin-bottom: 2rem;
+        max-width: 180px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .logo {
+        width: 100%;
+        height: auto;
+      }
+
+      .loading-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--text);
+      }
+
+      .loading-description {
+        font-size: 0.95rem;
+        color: var(--text);
+        opacity: 0.8;
+        margin-top: -0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 8px;
+        background-color: var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      #progressBar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--primary), #6366f1);
+        border-radius: 20px;
+        transition: width 0.1s ease;
+      }
+
+      .steps-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 0.5rem;
+        position: relative;
+      }
+
+      .steps-line {
+        position: absolute;
+        top: 16px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--border);
+        z-index: 1;
+      }
+
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .step-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--background);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        color: var(--border);
+        transition: all 0.3s ease;
+      }
+
+      .step-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text);
+        opacity: 0.7;
+        transition: all 0.3s ease;
+      }
+
+      .step.active .step-icon {
+        border-color: var(--primary);
+        color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+      }
+
+      .step.active .step-label {
+        opacity: 1;
+        color: var(--primary);
+      }
+
+      .step.completed .step-icon {
+        background-color: var(--success);
+        border-color: var(--success);
+        color: white;
+      }
+
+      .step.completed .step-label {
+        opacity: 1;
+        color: var(--success);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #111827;
+          --text: #f1f5f9;
+          --border: #334155;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loadingContainer">
+      <div class="loading-content">
+        <div class="logo-container">
+          <img
+            src="https://kanbanparachatwoot.com.br/wp-content/uploads/2025/02/image-5-114.png"
+            alt="Logo"
+            class="logo"
+          />
+        </div>
+        <h1 class="loading-title">Carregando</h1>
+        <p class="loading-description">
+          Preparando a demonstração do Kanban para Chatwoot. Por favor,
+          aguarde...
+        </p>
+        <div class="progress-container">
+          <div id="progressBar"></div>
+        </div>
+        <div class="steps-container">
+          <div class="steps-line"></div>
+          <div class="step">
+            <div class="step-icon">1</div>
+            <div class="step-label">Inicialização</div>
+          </div>
+          <div class="step">
+            <div class="step-icon">2</div>
+            <div class="step-label">Recursos</div>
+          </div>
+          <div class="step">
+            <div class="step-icon">3</div>
+            <div class="step-label">Validação</div>
+          </div>
+          <div class="step">
+            <div class="step-icon">4</div>
+            <div class="step-label">Conclusão</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script data-name="Loading">
+      document.addEventListener("DOMContentLoaded", function () {
+        const progressBar = document.getElementById("progressBar");
+        const steps = document.querySelectorAll(".step");
+        const container = document.getElementById("loadingContainer");
+        let currentStep = 0;
+        let progress = 0;
+
+        // Update progress bar
+        function updateProgress() {
+          progress += 1;
+          progressBar.style.width = `${progress}%`;
+
+          if (progress >= 100) {
+            clearInterval(progressInterval);
+          }
+        }
+
+        // Update steps
+        function updateSteps() {
+          if (currentStep >= steps.length) {
+            clearInterval(stepInterval);
+            return;
+          }
+
+          steps.forEach((step, index) => {
+            if (index === currentStep) {
+              step.classList.add("active");
+            } else if (index < currentStep) {
+              step.classList.add("completed");
+              const icon = step.querySelector(".step-icon");
+              icon.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            `;
+            }
+          });
+
+          currentStep++;
+        }
+
+        // Start intervals
+        const progressInterval = setInterval(updateProgress, 50);
+        const stepInterval = setInterval(updateSteps, 1250);
+
+        // Hide after 5 seconds
+        setTimeout(() => {
+          container.style.opacity = "0";
+          setTimeout(() => {
+            // Remover todas as classes e estilos adicionados
+            steps.forEach((step) => {
+              step.classList.remove("active", "completed");
+              const icon = step.querySelector(".step-icon");
+              // Restaurar o número original do ícone
+              if (icon.textContent === "") {
+                const stepIndex = Array.from(steps).indexOf(step) + 1;
+                icon.innerHTML = stepIndex;
+              }
+            });
+
+            // Remover a barra de progresso
+            progressBar.style.width = "0%";
+
+            // Esconder o container
+            container.style.display = "none";
+
+            // Remover o listener para evitar vazamento de memória
+            clearInterval(progressInterval);
+            clearInterval(stepInterval);
+          }, 500);
+        }, 5000);
+      });
+    </script>
+  </body>
+</html>
