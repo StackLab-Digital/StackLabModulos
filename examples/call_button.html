@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chatwoot Call Button Script</title>
+  </head>
+  <body>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Função principal para adicionar o botão de chamada flutuante
+        function adicionarBotaoChamada() {
+          // Verificar se o botão já existe para evitar duplicação
+          if (document.getElementById('botao-chamada-flutuante')) return;
+
+          // 1. Criar elemento de estilo para o botão e modal
+          const style = document.createElement('style');
+
+          style.innerHTML = `
+        /* Estilo para o botão flutuante */
+        #botao-chamada-flutuante {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background-color: #84CC16;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          z-index: 9999;
+          transition: all 0.3s ease;
+        }
+        
+        #botao-chamada-flutuante:hover {
+          transform: scale(1.1);
+          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Estilo para o modal */
+        #modal-chamada {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 10000;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        #modal-chamada.visivel {
+          display: flex;
+        }
+        
+        .modal-conteudo {
+          width: 350px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+        }
+        
+        .modal-cabecalho {
+          background: #84CC16;
+          color: white;
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        
+        .modal-cabecalho h3 {
+          margin: 0;
+          font-size: 18px;
+        }
+        
+        .modal-corpo {
+          padding: 16px;
+        }
+        
+        .form-grupo {
+          margin-bottom: 16px;
+        }
+        
+        .form-grupo label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        .form-grupo input, .form-grupo select {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+        
+        .botoes-modal {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          padding: 16px;
+          border-top: 1px solid #eee;
+        }
+        
+        .botao-cancelar {
+          padding: 8px 16px;
+          background: #f1f1f1;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        
+        .botao-ligar {
+          padding: 8px 16px;
+          background: #84CC16;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        
+        .fechar-modal {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 20px;
+          cursor: pointer;
+        }
+      `;
+
+          document.head.appendChild(style);
+
+          // 2. Criar o botão flutuante com o ícone SVG
+          const botao = document.createElement('div');
+          botao.id = 'botao-chamada-flutuante';
+          botao.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      `;
+
+          // 3. Criar o modal
+          const modal = document.createElement('div');
+          modal.id = 'modal-chamada';
+          modal.innerHTML = `
+        <div class="modal-conteudo">
+          <div class="modal-cabecalho">
+            <h3>Fazer ligação</h3>
+            <button class="fechar-modal">&times;</button>
+          </div>
+          <div class="modal-corpo">
+            <div class="form-grupo">
+              <label for="telefone">Número de telefone</label>
+              <input type="tel" id="telefone" placeholder="+55 (00) 00000-0000">
+            </div>
+            <div class="form-grupo">
+              <label for="tipo-chamada">Tipo de chamada</label>
+              <select id="tipo-chamada">
+                <option value="voz">Chamada de voz</option>
+                <option value="video">Chamada de vídeo</option>
+              </select>
+            </div>
+          </div>
+          <div class="botoes-modal">
+            <button class="botao-cancelar">Cancelar</button>
+            <button class="botao-ligar">Ligar</button>
+          </div>
+        </div>
+      `;
+
+          // 4. Adicionar elementos ao DOM
+          document.body.appendChild(botao);
+          document.body.appendChild(modal);
+
+          // 5. Adicionar eventos
+          botao.addEventListener('click', function () {
+            modal.classList.add('visivel');
+          });
+
+          const botaoFechar = modal.querySelector('.fechar-modal');
+          botaoFechar.addEventListener('click', function () {
+            modal.classList.remove('visivel');
+          });
+
+          const botaoCancelar = modal.querySelector('.botao-cancelar');
+          botaoCancelar.addEventListener('click', function () {
+            modal.classList.remove('visivel');
+          });
+
+          const botaoLigar = modal.querySelector('.botao-ligar');
+          botaoLigar.addEventListener('click', function () {
+            const telefone = document.getElementById('telefone').value;
+            const tipoChamada = document.getElementById('tipo-chamada').value;
+
+            // Aqui você pode adicionar sua lógica para iniciar a chamada
+            alert(
+              `Iniciando ${tipoChamada === 'voz' ? 'chamada de voz' : 'chamada de vídeo'} para: ${telefone}`
+            );
+
+            modal.classList.remove('visivel');
+          });
+
+          // Fechar ao clicar fora
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+              modal.classList.remove('visivel');
+            }
+          });
+        }
+
+        // Executar imediatamente
+        adicionarBotaoChamada();
+
+        // Executar quando houver mudanças no DOM
+        const observer = new MutationObserver(() => {
+          adicionarBotaoChamada();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+      });
+    </script>
+  </body>
+</html>

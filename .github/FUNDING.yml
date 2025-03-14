@@ -1,0 +1,11 @@
+# Configurações de financiamento para GitHub Sponsors
+
+# GitHub Sponsors
+github: [seu-usuario-do-github]
+
+# Opções de financiamento externas
+custom: ['https://pix.exemplo.com.br/seu-pix', 'https://paypal.me/seupaypal']
+# Notas sobre doações:
+# - A chave PIX é: seu-email@exemplo.com.br
+# - QR Code PIX: Disponível ao acessar o primeiro link
+# - Outros métodos: PayPal e transferência bancária disponíveis no segundo link
