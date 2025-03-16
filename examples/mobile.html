@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout com Navbar Inferior</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Remix Icons via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#57B0FF',
+                        navblue: '#57B0FF',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Detecta preferência de modo escuro do sistema */
+        @media (prefers-color-scheme: dark) {
+            html.light:not(.override) {
+                color-scheme: dark;
+                class: dark;
+            }
+        }
+        
+        /* Espaçamento forçado para o conteúdo principal */
+        body {
+            padding-top: 60px !important; /* Valor maior para garantir espaço suficiente */
+            padding-bottom: 70px !important;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
+        }
+        
+        /* Ajustes específicos para o app */
+        #app {
+            margin-top: 0 !important;
+        }
+        
+        .navbar-item-indicator {
+            height: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-container {
+            border-radius: 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        /* Estilo da barra de navegação em modo claro/escuro */
+        .dark .navbar-container {
+            background-color: #57B0FF;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <!-- Header fixo no topo - apenas mobile -->
+    <header class="fixed top-0 left-0 w-full py-3 z-[9999] bg-transparent md:hidden">
+        <div class="container mx-auto px-4 flex items-center">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 mr-3">
+                    <!-- Favicon com borda arredondada -->
+                    <div class="w-8 h-8 rounded-full bg-navblue flex items-center justify-center overflow-hidden shadow-sm">
+                        <i class="ri-chat-1-fill text-white text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <!-- Título do site -->
+                    <h1 class="text-lg font-semibold text-gray-800 dark:text-white">Chatwoot</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Script para esconder o <aside> em dispositivos móveis -->
+    <script data-name="Mobile">
+        document.addEventListener('DOMContentLoaded', function() {
+            function hideAsideOnMobile() {
+                const asideSelector = '#app > div.flex.flex-wrap.app-wrapper.dark\\:text-slate-300 > aside';
+                const asideElement = document.querySelector(asideSelector);
+
+                if (asideElement) {
+                    if (window.innerWidth <= 768) {
+                        asideElement.style.display = 'none';
+                    } else {
+                        asideElement.style.display = '';
+                    }
+                }
+            }
+
+            // Força aplicação de margens e paddings para evitar sobreposição
+            function applySpacing() {
+                if (window.innerWidth <= 768) {
+                    // Aplicar ao body
+                    document.body.style.paddingTop = '60px';
+                    document.body.style.paddingBottom = '70px';
+                    
+                    // Procurar elementos filhos diretos do body para aplicar margem
+                    Array.from(document.body.children).forEach(child => {
+                        if (child.tagName !== 'HEADER' && child.tagName !== 'SCRIPT' && 
+                            child.tagName !== 'DIV' && !child.classList.contains('fixed')) {
+                            child.style.marginTop = '60px';
+                        }
+                    });
+                    
+                    // Encontra e ajusta o elemento app
+                    const appElement = document.getElementById('app');
+                    if (appElement) {
+                        const computedStyle = window.getComputedStyle(appElement);
+                        if (computedStyle.position === 'fixed' || computedStyle.position === 'absolute') {
+                            appElement.style.top = '60px';
+                        }
+                    }
+                } else {
+                    document.body.style.paddingTop = '';
+                    document.body.style.paddingBottom = '';
+                }
+            }
+
+            hideAsideOnMobile();
+            applySpacing();
+            
+            window.addEventListener('resize', function() {
+                hideAsideOnMobile();
+                applySpacing();
+            });
+            
+            // Aplicar repetidamente para garantir que os estilos não sejam sobrescritos
+            const interval = setInterval(function() {
+                hideAsideOnMobile();
+                applySpacing();
+            }, 200);
+            
+            setTimeout(function() {
+                clearInterval(interval);
+                setInterval(applySpacing, 1000);
+            }, 5000);
+        });
+    </script>
+
+    <!-- Script para modo escuro -->
+    <script data-name="DarkMode">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica se o modo escuro é preferido pelo sistema
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+            
+            // Observa mudanças na preferência de cor do sistema
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            });
+        });
+    </script>
+
+    <!-- Script para navegação -->
+    <script data-name="Navigation">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Função para extrair o ID da conta da URL atual
+            function getAccountId() {
+                const urlPath = window.location.pathname;
+                const matches = urlPath.match(/\/app\/accounts\/(\d+)/);
+                return matches ? matches[1] : null;
+            }
+            
+            // Função para navegar para a rota específica
+            function navigateTo(route) {
+                const accountId = getAccountId();
+                if (accountId) {
+                    const baseUrl = `${window.location.origin}/app/accounts/${accountId}/`;
+                    window.location.href = baseUrl + route;
+                }
+            }
+            
+            // Mapeia as rotas para cada item do menu
+            const routes = [
+                'dashboard',            // Conversas
+                'contacts',             // Contatos
+                'kanban',               // Kanban
+                'reports/overview',     // Relatórios
+                'settings/general'      // Ajustes
+            ];
+            
+            // Adiciona evento de clique aos itens do menu
+            document.querySelectorAll('.navbar-item').forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    // Remove a classe active de todos
+                    document.querySelectorAll('.navbar-item').forEach(navItem => {
+                        navItem.classList.remove('active');
+                    });
+                    
+                    // Adiciona a classe active ao item clicado
+                    this.classList.add('active');
+                    
+                    // Navega para a rota correspondente
+                    navigateTo(routes[index]);
+                });
+            });
+            
+            // Define o item ativo com base na URL atual
+            const currentPath = window.location.pathname;
+            routes.forEach((route, index) => {
+                if (currentPath.endsWith(route) || 
+                   (route === 'dashboard' && currentPath.endsWith('/app/accounts/' + getAccountId() + '/'))) {
+                    const navItems = document.querySelectorAll('.navbar-item');
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    if (navItems[index]) {
+                        navItems[index].classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Navbar Inferior - Visível apenas em dispositivos móveis (menor que md:768px) -->
+    <div class="fixed bottom-0 w-full md:hidden z-[9999]">
+        <nav class="navbar-container bg-navblue dark:bg-navblue mx-auto max-w-lg shadow-lg">
+            <ul class="flex justify-between items-center px-0 py-2">
+                <li class="navbar-item flex flex-col items-center justify-center w-1/5 relative">
+                    <div class="navbar-item-indicator w-8 bg-white absolute -top-2 rounded-full opacity-0"></div>
+                    <i class="ri-message-2-line text-xl text-white"></i>
+                    <span class="text-xs text-white mt-0">Conversas</span>
+                </li>
+                <li class="navbar-item flex flex-col items-center justify-center w-1/5 relative">
+                    <div class="navbar-item-indicator w-8 bg-white absolute -top-2 rounded-full opacity-0"></div>
+                    <i class="ri-contacts-line text-xl text-white"></i>
+                    <span class="text-xs text-white mt-0">Contatos</span>
+                </li>
+                <li class="navbar-item flex flex-col items-center justify-center w-1/5 relative">
+                    <div class="navbar-item-indicator w-8 bg-white absolute -top-2 rounded-full opacity-0"></div>
+                    <i class="ri-layout-masonry-line text-xl text-white"></i>
+                    <span class="text-xs text-white mt-0">Kanban</span>
+                </li>
+                <li class="navbar-item flex flex-col items-center justify-center w-1/5 relative">
+                    <div class="navbar-item-indicator w-8 bg-white absolute -top-2 rounded-full opacity-0"></div>
+                    <i class="ri-bar-chart-2-line text-xl text-white"></i>
+                    <span class="text-xs text-white mt-0">Relatórios</span>
+                </li>
+                <li class="navbar-item flex flex-col items-center justify-center w-1/5 relative">
+                    <div class="navbar-item-indicator w-8 bg-white absolute -top-2 rounded-full opacity-0"></div>
+                    <i class="ri-settings-3-line text-xl text-white"></i>
+                    <span class="text-xs text-white mt-0">Ajustes</span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Estilo adicional para o item ativo -->
+    <style>
+        .navbar-item.active i,
+        .navbar-item.active span {
+            color: #ffffff !important;
+        }
+        
+        .navbar-item.active .navbar-item-indicator {
+            opacity: 1;
+            animation: indicatorIn 0.3s ease forwards;
+        }
+        
+        @keyframes indicatorIn {
+            0% { transform: translateY(-5px); opacity: 0; width: 0; }
+            100% { transform: translateY(0); opacity: 1; width: 8px; }
+        }
+        
+        .navbar-item {
+            cursor: pointer;
+            position: relative;
+            transform: translate3d(0, 0, 0);
+        }
+        
+        .navbar-item i,
+        .navbar-item span {
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+        }
+        
+        .navbar-item-indicator {
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+        }
+        
+        .navbar-item i {
+            margin-bottom: -2px;
+        }
+        
+        .navbar-item span {
+            margin-top: -2px;
+        }
+        
+        /* Animação ao clicar */
+        .navbar-item:active {
+            transform: scale(0.95);
+        }
+    </style>
+</body>
+</html>

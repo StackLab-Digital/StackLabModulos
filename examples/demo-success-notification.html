@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notificação de Sucesso</title>
+    <style>
+      :root {
+        --primary: #4361ee;
+        --success: #10b981;
+        --background: #f8fafc;
+        --text: #1e293b;
+        --border: #e2e8f0;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: var(--background);
+        color: var(--text);
+        height: 100%;
+        width: 100%;
+      }
+
+      #notificationContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        transition: all 0.3s ease;
+      }
+
+      .notification-content {
+        width: 90%;
+        max-width: 450px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transform: translateY(0);
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: center;
+        padding: 2.5rem;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--success);
+      }
+
+      .notification-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--text);
+      }
+
+      .notification-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text);
+        opacity: 0.8;
+        margin-bottom: 1.5rem;
+      }
+
+      .notification-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: var(--success);
+        border: none;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #0ca678;
+      }
+
+      .btn-link {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        opacity: 0.7;
+      }
+
+      .btn-link:hover {
+        opacity: 1;
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .checkbox-label {
+        font-size: 0.875rem;
+        color: var(--text);
+        opacity: 0.7;
+        cursor: pointer;
+      }
+
+      .animated-checkmark {
+        animation: scaleCheck 0.5s ease forwards;
+        transform-origin: center;
+      }
+
+      .notification-details {
+        background-color: rgba(67, 97, 238, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        text-align: left;
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .detail-label {
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .detail-value {
+        color: var(--text);
+        opacity: 0.8;
+      }
+
+      @keyframes scaleCheck {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #111827;
+          --text: #f1f5f9;
+          --border: #334155;
+        }
+
+        .notification-content {
+          background-color: #1e293b;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="notificationContainer">
+      <div class="notification-content">
+        <div class="success-icon">
+          <svg
+            class="animated-checkmark"
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+        </div>
+        <h1 class="notification-title">Operação concluída com sucesso!</h1>
+        <p class="notification-description">
+          Seu quadro Kanban foi integrado com sucesso ao Chatwoot. Agora você
+          pode gerenciar todos os seus atendimentos de forma visual.
+        </p>
+
+        <div class="notification-details">
+          <div class="detail-item">
+            <span class="detail-label">Integrações ativas:</span>
+            <span class="detail-value">Chatwoot</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">Sincronizando</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Caixas de entrada:</span>
+            <span class="detail-value">3</span>
+          </div>
+        </div>
+
+        <div class="notification-actions">
+          <a href="#" class="btn btn-primary">Ir para o Dashboard</a>
+          <button id="closeBtn" class="btn btn-link">Fechar</button>
+        </div>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="dontShow" />
+          <label for="dontShow" class="checkbox-label"
+            >Não mostrar novamente</label
+          >
+        </div>
+      </div>
+    </div>
+
+    <script data-name="SuccessNotification">
+      document.addEventListener("DOMContentLoaded", function () {
+        const notificationContainer = document.getElementById(
+          "notificationContainer"
+        );
+        const closeBtn = document.getElementById("closeBtn");
+        const dontShowCheckbox = document.getElementById("dontShow");
+
+        // Simular animação de entrada
+        setTimeout(() => {
+          document.querySelector(".notification-content").style.transform =
+            "translateY(0)";
+        }, 100);
+
+        // Fechar a notificação
+        closeBtn.addEventListener("click", function () {
+          notificationContainer.style.opacity = "0";
+          setTimeout(() => {
+            notificationContainer.style.display = "none";
+
+            // Salvar preferência se checkbox marcado
+            if (dontShowCheckbox.checked) {
+              localStorage.setItem("dontShowSuccessNotification", "true");
+              console.log(
+                "Preferência salva: não mostrar notificação novamente"
+              );
+            }
+          }, 300);
+        });
+
+        // Fechar ao clicar fora
+        notificationContainer.addEventListener("click", function (e) {
+          if (e.target === notificationContainer) {
+            closeBtn.click();
+          }
+        });
+
+        // Verificar se a notificação deve ser mostrada
+        function shouldShowNotification() {
+          return localStorage.getItem("dontShowSuccessNotification") !== "true";
+        }
+
+        // Ocultar se necessário (simulação)
+        if (!shouldShowNotification()) {
+          console.log(
+            "Notificação não exibida devido às preferências do usuário"
+          );
+          notificationContainer.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>

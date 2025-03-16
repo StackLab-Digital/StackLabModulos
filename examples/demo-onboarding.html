@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding - Kanban para Chatwoot</title>
+    <style>
+      :root {
+        --primary: #4361ee;
+        --success: #10b981;
+        --background: #f8fafc;
+        --text: #1e293b;
+        --border: #e2e8f0;
+        --secondary: #6366f1;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: var(--background);
+        color: var(--text);
+        height: 100%;
+        width: 100%;
+      }
+
+      #onboardingContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+      }
+
+      .onboarding-content {
+        width: 90%;
+        max-width: 600px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .onboarding-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .logo-small {
+        height: 30px;
+        width: auto;
+      }
+
+      .step-indicator {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--border);
+      }
+
+      .step-dot.active {
+        background-color: var(--primary);
+      }
+
+      .onboarding-body {
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+      }
+
+      .step-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 2.5rem;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.3s ease;
+        pointer-events: none;
+      }
+
+      .step-screen.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: all;
+      }
+
+      .step-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text);
+      }
+
+      .step-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        color: var(--text);
+        opacity: 0.8;
+      }
+
+      .onboarding-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .btn-outline:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        border: none;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #3651d4;
+      }
+
+      .integration-option {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .integration-option:hover {
+        border-color: var(--primary);
+        background-color: rgba(67, 97, 238, 0.05);
+      }
+
+      .integration-option.selected {
+        border-color: var(--primary);
+        background-color: rgba(67, 97, 238, 0.1);
+      }
+
+      .integration-icon {
+        width: 36px;
+        height: 36px;
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background-color: rgba(67, 97, 238, 0.1);
+      }
+
+      .integration-info {
+        flex: 1;
+      }
+
+      .integration-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .integration-description {
+        font-size: 0.875rem;
+        opacity: 0.7;
+      }
+
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+      }
+
+      .feature-text {
+        font-size: 0.875rem;
+        line-height: 1.4;
+      }
+
+      .skip-link {
+        font-size: 0.875rem;
+        color: var(--text);
+        opacity: 0.6;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+        margin-top: 0.5rem;
+        display: inline-block;
+      }
+
+      .skip-link:hover {
+        opacity: 1;
+      }
+
+      .progress-bar {
+        height: 4px;
+        background-color: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 2rem;
+      }
+
+      .progress-bar-inner {
+        height: 100%;
+        background-color: var(--success);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #111827;
+          --text: #f1f5f9;
+          --border: #334155;
+        }
+
+        .onboarding-content {
+          background-color: #1e293b;
+        }
+
+        .btn-outline:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="onboardingContainer">
+      <div class="onboarding-content">
+        <div class="onboarding-header">
+          <img
+            src="https://kanbanparachatwoot.com.br/wp-content/uploads/2025/02/image-5-114.png"
+            alt="Logo"
+            class="logo-small"
+          />
+          <div class="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+          </div>
+        </div>
+
+        <div class="onboarding-body">
+          <!-- Etapa 1: Boas-vindas -->
+          <div class="step-screen active" id="step1">
+            <h1 class="step-title">Bem-vindo ao Kanban para Chatwoot!</h1>
+            <p class="step-description">
+              Vamos configurar sua conta em poucos passos para que você tenha
+              uma experiência incrível com nosso sistema de gestão de
+              atendimentos integrado ao Chatwoot.
+            </p>
+
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div class="feature-text">Integração com Chatwoot</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div class="feature-text">Automações e Regras</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div class="feature-text">Fluxos de Trabalho</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div class="feature-text">Dashboards e Relatórios</div>
+              </div>
+            </div>
+
+            <a href="#" class="skip-link"
+              >Já conheço o sistema, pular introdução</a
+            >
+          </div>
+
+          <!-- Etapa 2: Conectar Chatwoot -->
+          <div class="step-screen" id="step2">
+            <h1 class="step-title">Conecte seu Chatwoot</h1>
+            <p class="step-description">
+              Escolha como deseja conectar sua conta Chatwoot ao nosso sistema.
+            </p>
+
+            <div class="integration-options">
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">API Chatwoot</div>
+                  <div class="integration-description">
+                    Conecte usando suas credenciais de API do Chatwoot
+                  </div>
+                </div>
+              </div>
+
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Chatwoot Cloud</div>
+                  <div class="integration-description">
+                    Conecte-se diretamente à sua conta Chatwoot Cloud
+                  </div>
+                </div>
+              </div>
+
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Auto-hospedado</div>
+                  <div class="integration-description">
+                    Configure a conexão com seu Chatwoot auto-hospedado
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Etapa 3: Configurar Fluxos -->
+          <div class="step-screen" id="step3">
+            <h1 class="step-title">Configure seus Fluxos</h1>
+            <p class="step-description">
+              Escolha um modelo pré-configurado ou crie um fluxo personalizado
+              para seu time.
+            </p>
+
+            <div class="integration-options">
+              <div class="integration-option selected">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Padrão</div>
+                  <div class="integration-description">
+                    Fluxo básico com Novo, Em Progresso, Concluído
+                  </div>
+                </div>
+              </div>
+
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline
+                      points="22 12 18 12 15 21 9 3 6 12 2 12"
+                    ></polyline>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Suporte Avançado</div>
+                  <div class="integration-description">
+                    Fluxo para equipes de suporte com priorização
+                  </div>
+                </div>
+              </div>
+
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 20h9"></path>
+                    <path
+                      d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Personalizado</div>
+                  <div class="integration-description">
+                    Crie um fluxo personalizado do zero
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-bar-inner" style="width: 60%"></div>
+            </div>
+          </div>
+
+          <!-- Etapa 4: Convide a Equipe -->
+          <div class="step-screen" id="step4">
+            <h1 class="step-title">Convide sua equipe</h1>
+            <p class="step-description">
+              Convide os membros da sua equipe para colaborar no Kanban para
+              Chatwoot.
+            </p>
+
+            <div class="form-group">
+              <label for="emails" class="form-label"
+                >E-mails dos membros da equipe</label
+              >
+              <textarea
+                id="emails"
+                rows="3"
+                class="form-input"
+                placeholder="Insira os e-mails separados por vírgula ou linha"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Permissões de usuário</label>
+              <div class="integration-option">
+                <div class="integration-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-title">Membros da equipe</div>
+                  <div class="integration-description">
+                    Podem visualizar e mover cartões no quadro
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="skip-section">
+              <a href="#" class="skip-link"
+                >Pular este passo, convidarei mais tarde</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="onboarding-footer">
+          <button class="btn btn-outline" id="prevBtn">Anterior</button>
+          <button class="btn btn-primary" id="nextBtn">Próximo</button>
+        </div>
+      </div>
+    </div>
+
+    <script data-name="Onboarding">
+      document.addEventListener("DOMContentLoaded", function () {
+        const onboardingContainer = document.getElementById(
+          "onboardingContainer"
+        );
+        const steps = document.querySelectorAll(".step-screen");
+        const dots = document.querySelectorAll(".step-dot");
+        const nextBtn = document.getElementById("nextBtn");
+        const prevBtn = document.getElementById("prevBtn");
+        const skipLink = document.querySelector(".skip-link");
+
+        let currentStep = 0;
+
+        // Inicializar
+        updateButtons();
+
+        // Eventos dos botões
+        nextBtn.addEventListener("click", () => {
+          if (currentStep < steps.length - 1) {
+            goToStep(currentStep + 1);
+          } else {
+            // Concluir onboarding
+            completeOnboarding();
+          }
+        });
+
+        prevBtn.addEventListener("click", () => {
+          if (currentStep > 0) {
+            goToStep(currentStep - 1);
+          }
+        });
+
+        skipLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          completeOnboarding();
+        });
+
+        // Navegação das opções de integração
+        const integrationOptions = document.querySelectorAll(
+          ".integration-option"
+        );
+        integrationOptions.forEach((option) => {
+          option.addEventListener("click", () => {
+            // Remover a classe selecionada de todas as opções no mesmo grupo
+            const parent = option.parentNode;
+            parent.querySelectorAll(".integration-option").forEach((item) => {
+              item.classList.remove("selected");
+            });
+
+            // Adicionar seleção à opção clicada
+            option.classList.add("selected");
+          });
+        });
+
+        // Funções
+        function goToStep(step) {
+          // Esconder todas as etapas
+          steps.forEach((s) => s.classList.remove("active"));
+          dots.forEach((d) => d.classList.remove("active"));
+
+          // Mostrar a etapa atual
+          steps[step].classList.add("active");
+          dots[step].classList.add("active");
+
+          // Atualizar índice atual
+          currentStep = step;
+
+          // Atualizar botões
+          updateButtons();
+        }
+
+        function updateButtons() {
+          // Atualizar estado do botão anterior
+          if (currentStep === 0) {
+            prevBtn.style.visibility = "hidden";
+          } else {
+            prevBtn.style.visibility = "visible";
+          }
+
+          // Atualizar texto do botão próximo
+          if (currentStep === steps.length - 1) {
+            nextBtn.textContent = "Concluir";
+          } else {
+            nextBtn.textContent = "Próximo";
+          }
+        }
+
+        function completeOnboarding() {
+          // Efeito de fechamento
+          onboardingContainer.style.opacity = "0";
+          setTimeout(() => {
+            onboardingContainer.style.display = "none";
+            // Aqui você pode redirecionar para o dashboard
+            console.log("Onboarding concluído");
+          }, 500);
+        }
+      });
+    </script>
+  </body>
+</html>
