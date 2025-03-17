@@ -1,0 +1,84 @@
+<script data-name="Canais - Icones Personalizados" data-type="style" data-name="Canais - Icones Personalizados" data-type="style" data-name="Canais - Icones Personalizados" data-type="style" data-name="Icones - Canais" data-type="style">
+document.addEventListener('DOMContentLoaded', function () {
+    function addIcons() {
+        document.querySelectorAll('.inbox--name').forEach(item => {
+            const conversation = item.closest('.conversation');
+            if (!conversation) return;
+
+            const userThumbnail = conversation.querySelector('.user-thumbnail-box');
+            if (!userThumbnail) return;
+
+            const nameText = item.textContent.toLowerCase();
+
+            // Remove qualquer ícone antigo antes de adicionar um novo
+            userThumbnail.querySelectorAll('.custom-icon-container').forEach(el => el.remove());
+
+            let svgIcon = null;
+            if (nameText.includes('whatsapp')) {
+                svgIcon = createSVGIcon('whatsapp');
+            } else if (nameText.includes('insta')) {
+                svgIcon = createSVGIcon('instagram');
+            }
+
+            if (svgIcon) {
+                const iconContainer = document.createElement('div');
+                iconContainer.classList.add('custom-icon-container');
+                iconContainer.style.position = 'absolute';
+                iconContainer.style.right = '0px';
+                iconContainer.style.bottom = '0px';
+                iconContainer.style.width = '15px';
+                iconContainer.style.height = '15px';
+
+                iconContainer.appendChild(svgIcon);
+                userThumbnail.style.position = 'relative'; // Garante que o ícone fique posicionado corretamente
+                userThumbnail.appendChild(iconContainer);
+            }
+        });
+    }
+
+    function createSVGIcon(type) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "15");
+    svg.setAttribute("height", "15");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.classList.add("custom-icon");
+
+    if (type === 'whatsapp') {
+        svg.innerHTML = `
+            <circle cx="12" cy="12" r="10" fill="#25D366"/>
+            <path fill="#fff" d="M16.2 13.7c-.3-.2-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.2-.2.3-.7.9-.9 1.1s-.3.2-.6.1c-.3-.2-1.2-.5-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6l.9-1c.1-.1.1-.2.1-.3s0-.3-.1-.4c-.1-.1-.6-1.5-.8-2s-.4-.4-.6-.4h-.5c-.2 0-.4 0-.6.3s-.8.9-.8 2c0 1 .8 2 1 2.2.1.1 1.8 3.1 4.4 4.2 2.7 1.1 2.7.7 3.2.7.5 0 1.1-.4 1.3-.8s.2-.7.1-.8c-.1-.1-.3-.2-.6-.4Z"/>
+        `;
+    } else if (type === 'instagram') {
+        svg.innerHTML = `
+            <defs>
+                <linearGradient id="instaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#E09B3D"/>
+                    <stop offset="30%" stop-color="#C74C4D"/>
+                    <stop offset="60%" stop-color="#C21975"/>
+                    <stop offset="100%" stop-color="#7024C4"/>
+                </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="20" height="20" rx="4" fill="url(#instaGradient)"/>
+            <circle cx="12" cy="12" r="5" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+        `;
+    }
+    return svg;
+}
+
+
+    // Executa a função imediatamente após o carregamento da página
+    window.addEventListener('load', () => {
+        setInterval(addIcons, 500);
+    });
+
+    // Configura o MutationObserver para observar mudanças no main
+    const mainNode = document.querySelector('main');
+    if (mainNode) {
+        const observer = new MutationObserver(addIcons);
+        observer.observe(mainNode, { childList: true, subtree: true });
+    }
+});
+</script>
