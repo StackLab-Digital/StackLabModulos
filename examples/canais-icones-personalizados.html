@@ -1,84 +1,164 @@
-<script data-name="Canais - Icones Personalizados" data-type="style" data-name="Canais - Icones Personalizados" data-type="style" data-name="Canais - Icones Personalizados" data-type="style" data-name="Icones - Canais" data-type="style">
+<script>
 document.addEventListener('DOMContentLoaded', function () {
+    const INSERT_MODE = "inbox-name"; // Opções: "inbox-name" ou "user-thumbnail"
+
     function addIcons() {
-        document.querySelectorAll('.inbox--name').forEach(item => {
-            const conversation = item.closest('.conversation');
+        document.querySelectorAll('.inbox--name, a.inline-flex.text-left, a.flex.h-8.items-center').forEach(item => {
+            const conversation = item.closest('.conversation') || item;
             if (!conversation) return;
 
-            const userThumbnail = conversation.querySelector('.user-thumbnail-box');
-            if (!userThumbnail) return;
+            let userThumbnail = conversation.querySelector('.user-thumbnail-box');
+            let inboxName = item.closest('.inbox--name');
 
-            const nameText = item.textContent.toLowerCase();
+            let spanElement = item.querySelector('span.inline-flex') || 
+                              item.querySelector('span.size-4.grid.place-content-center.rounded-full');
 
-            // Remove qualquer ícone antigo antes de adicionar um novo
-            userThumbnail.querySelectorAll('.custom-icon-container').forEach(el => el.remove());
+            if (!userThumbnail && !inboxName && !spanElement) return;
 
             let svgIcon = null;
-            if (nameText.includes('whatsapp')) {
+            const text = item.textContent.toLowerCase();
+
+            if (text.includes('whats')) {
                 svgIcon = createSVGIcon('whatsapp');
-            } else if (nameText.includes('insta')) {
+            } else if (text.includes('insta')) {
                 svgIcon = createSVGIcon('instagram');
+            } else if (text.includes('face')) {
+                svgIcon = createSVGIcon('facebook');
+            } else if (text.includes('tele')) {
+                svgIcon = createSVGIcon('telegram');
+            } else if (text.includes('email') || text.includes('mail')) {
+                svgIcon = createSVGIcon('email');
+            } else if (text.includes('livre')) {
+                svgIcon = createSVGIcon('mercadolivre');
+            } else if (text.includes('olx')) {
+                svgIcon = createSVGIcon('olx');
             }
 
-            if (svgIcon) {
+            if (!svgIcon) return;
+
+            // Aplica apenas na .inbox--name se o modo for "inbox-name"
+            if (INSERT_MODE === "inbox-name" && inboxName) {
+                inboxName.querySelectorAll('.custom-icon, svg').forEach(el => el.remove());
+                inboxName.insertBefore(svgIcon, inboxName.firstChild);
+            }
+
+            // Aplica apenas na .user-thumbnail-box se o modo for "user-thumbnail"
+            if (INSERT_MODE === "user-thumbnail" && userThumbnail) {
+                userThumbnail.querySelectorAll('.custom-icon-container, svg').forEach(el => el.remove());
+
                 const iconContainer = document.createElement('div');
                 iconContainer.classList.add('custom-icon-container');
                 iconContainer.style.position = 'absolute';
-                iconContainer.style.right = '0px';
-                iconContainer.style.bottom = '0px';
-                iconContainer.style.width = '15px';
-                iconContainer.style.height = '15px';
+                iconContainer.style.right = '-3px';
+                iconContainer.style.bottom = '-3px';
+                iconContainer.style.display = 'flex';
+                iconContainer.style.alignItems = 'center';
+                iconContainer.style.justifyContent = 'center';
+                iconContainer.style.width = '16px';
+                iconContainer.style.height = '16px';
+
+                svgIcon.setAttribute("width", "16");
+                svgIcon.setAttribute("height", "16");
 
                 iconContainer.appendChild(svgIcon);
-                userThumbnail.style.position = 'relative'; // Garante que o ícone fique posicionado corretamente
+                userThumbnail.style.position = 'relative';
                 userThumbnail.appendChild(iconContainer);
+            }
+
+            // Sempre aplica nos spans (span.inline-flex e span.size-4.grid)
+            if (spanElement) {
+                spanElement.querySelectorAll('.custom-icon, svg').forEach(el => el.remove());
+                spanElement.classList.remove('bg-slate-100', 'dark:bg-slate-700');
+
+                const spanContainer = document.createElement('div');
+                spanContainer.classList.add('custom-icon-container');
+                spanContainer.style.position = 'absolute';
+                spanContainer.style.top = '50%';
+                spanContainer.style.left = '50%';
+                spanContainer.style.transform = 'translate(-50%, -50%)';
+                spanContainer.style.display = 'flex';
+                spanContainer.style.alignItems = 'center';
+                spanContainer.style.justifyContent = 'center';
+                spanContainer.style.width = '16px';
+                spanContainer.style.height = '16px';
+
+                svgIcon.setAttribute("width", "16");
+                svgIcon.setAttribute("height", "16");
+
+                spanContainer.appendChild(svgIcon);
+                spanElement.style.position = 'relative';
+                spanElement.appendChild(spanContainer);
             }
         });
     }
 
     function createSVGIcon(type) {
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "15");
-    svg.setAttribute("height", "15");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    svg.classList.add("custom-icon");
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("fill", "none");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.classList.add("custom-icon");
+        svg.setAttribute("width", "16");
+        svg.setAttribute("height", "16");
+        svg.setAttribute("viewBox", "0 0 24 24");
 
-    if (type === 'whatsapp') {
-        svg.innerHTML = `
-            <circle cx="12" cy="12" r="10" fill="#25D366"/>
-            <path fill="#fff" d="M16.2 13.7c-.3-.2-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.2-.2.3-.7.9-.9 1.1s-.3.2-.6.1c-.3-.2-1.2-.5-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6l.9-1c.1-.1.1-.2.1-.3s0-.3-.1-.4c-.1-.1-.6-1.5-.8-2s-.4-.4-.6-.4h-.5c-.2 0-.4 0-.6.3s-.8.9-.8 2c0 1 .8 2 1 2.2.1.1 1.8 3.1 4.4 4.2 2.7 1.1 2.7.7 3.2.7.5 0 1.1-.4 1.3-.8s.2-.7.1-.8c-.1-.1-.3-.2-.6-.4Z"/>
-        `;
-    } else if (type === 'instagram') {
-        svg.innerHTML = `
-            <defs>
-                <linearGradient id="instaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#E09B3D"/>
-                    <stop offset="30%" stop-color="#C74C4D"/>
-                    <stop offset="60%" stop-color="#C21975"/>
-                    <stop offset="100%" stop-color="#7024C4"/>
-                </linearGradient>
-            </defs>
-            <rect x="2" y="2" width="20" height="20" rx="4" fill="url(#instaGradient)"/>
-            <circle cx="12" cy="12" r="5" stroke="white" stroke-width="2" fill="none"/>
-            <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
-        `;
+        if (INSERT_MODE === "inbox-name") {
+            svg.style.marginRight = "6px";  
+        }
+
+        if (type === 'whatsapp') {
+            svg.innerHTML = `
+                <circle cx="12" cy="12" r="10" fill="#25D366"/>
+                <path fill="white" d="M16.6 13.57c-.23-.12-1.37-.67-1.58-.75-.2-.07-.37-.12-.53.13-.16.24-.6.75-.73.9-.13.14-.27.16-.5.05-.24-.12-1.02-.37-1.94-1.2-.72-.64-1.2-1.44-1.34-1.67-.14-.24-.01-.37.1-.5.1-.1.24-.27.36-.4.12-.14.16-.24.23-.4.08-.16.03-.3-.02-.42-.05-.12-.55-1.3-.76-1.78-.2-.47-.41-.41-.56-.41-.14 0-.3-.01-.47-.01a.91.91 0 0 0-.67.31c-.23.24-.88.83-.88 2.03s.9 2.35 1.02 2.52c.12.16 1.76 2.63 4.26 3.68 1.49.64 2.08.7 2.81.59.45-.07 1.4-.57 1.6-1.12.2-.55.2-1.03.14-1.13-.07-.1-.22-.16-.46-.27Z"/>
+            `;
+        } else if (type === 'email') {
+            svg.innerHTML = `
+                <rect width="24" height="16" x="0" y="4" rx="3" fill="#FF5733"/>
+                <path fill="white" d="M4 6l8 5 8-5v10H4z"/>
+            `;
+        } else if (type === 'mercadolivre') {
+            svg.innerHTML = `
+                <circle cx="12" cy="12" r="10" fill="#FFDE00"/>
+                <path fill="white" d="M8 12c1.2 1 2.4 1 4 0l1 1c-2 2-4 2-6 0l1-1z"/>
+                <path fill="#002E6D" d="M7.5 12c1.5 1.5 3 1.5 5 0l1.5 1.5c-2 2-5 2-7.5 0L7.5 12Z"/>
+                <circle cx="9" cy="11" r="0.8" fill="#002E6D"/>
+                <circle cx="15" cy="11" r="0.8" fill="#002E6D"/>
+            `;
+        } else if (type === 'olx') {
+            svg.innerHTML = `
+                <circle cx="12" cy="12" r="10" fill="#6E0AD6"/>
+                <text x="50%" y="58%" text-anchor="middle" fill="white" font-size="7" font-family="Arial" font-weight="bold">OLX</text>
+            `;
+        } else if (type === 'instagram') {
+            svg.innerHTML = `
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#C13584"/>
+                <circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5" fill="none"/>
+                <circle cx="17" cy="7" r="1" fill="white"/>
+            `;
+        } else if (type === 'facebook') {
+            svg.innerHTML = `
+                <path fill="#1877F2" d="M22,12A10,10,0,1,0,12,22V14H9v-2h3V9.5A3.5,3.5,0,0,1,15.5,6h2V8h-1.5C14,8,14,9,14,9.5V12h3l-1,2H14v8A10,10,0,0,0,22,12Z"/>
+            `;
+        } else if (type === 'telegram') {
+            svg.innerHTML = `
+                <circle cx="12" cy="12" r="10" fill="#0088CC"/>
+                <path fill="white" d="M17.5 7.5c.5-.4.5-1-.2-1.2l-11 4.3c-.6.3-.6 1 .1 1.3l3 1.1 7.2-5.3c.2-.2.5 0 .3.2l-5.5 5.1 3.2 2.2c.6.3 1.3.1 1.4-.6l2-7c.1-.3 0-.7-.3-.8Z"/>
+            `;
+        }
+
+        return svg;
     }
-    return svg;
-}
 
+    setInterval(addIcons, 500);
 
-    // Executa a função imediatamente após o carregamento da página
-    window.addEventListener('load', () => {
-        setInterval(addIcons, 500);
-    });
-
-    // Configura o MutationObserver para observar mudanças no main
     const mainNode = document.querySelector('main');
     if (mainNode) {
         const observer = new MutationObserver(addIcons);
         observer.observe(mainNode, { childList: true, subtree: true });
     }
+
+    document.body.addEventListener('mouseenter', addIcons, true);
+    document.body.addEventListener('mouseleave', addIcons, true);
+
+    addIcons();
 });
 </script>
